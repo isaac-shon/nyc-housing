@@ -1,8 +1,10 @@
 import requests
 import numpy as np
 import pandas as pd
+import geopandas as gpd
 import matplotlib.pyplot as np
 import seaborn as sns
+from shapely.geometry import shape
 
 #----------------------------------------------------------#
 '''
@@ -41,3 +43,25 @@ community_district_df = fetch_data(community_district_url)
 project_df = fetch_data(project_level_url, params)
 
 #----------------------------------------------------------#
+'''
+CLEAN community_district_df AND CONVERT TO GEODATAFRAME:
+'''
+# Create borough column:
+community_district_df['borough'] = community_district_df['commntydst'].apply(
+    lambda x: 'Bronx' if x.startswith('1') else
+              'Brooklyn' if x.startswith('2') else
+              'Manhattan' if x.startswith('3') else
+              'Queens' if x.startswith('4') else
+              'Staten Island' if x.startswith('5') else
+              'Unknown'  # If unknown
+)
+
+# Convert GeoJSON "the_geom" string column to shapely:
+community_district_df['the_geom'] = community_district_df['the_geom'].apply(lambda x: shape(x))
+
+# Convert community_district_df to a GeoDataFrame:
+community_district_df = gpd.GeoDataFrame(community_district_df, geometry='the_geom')
+
+#----------------------------------------------------------#
+
+
