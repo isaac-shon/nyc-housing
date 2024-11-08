@@ -1,3 +1,4 @@
+import os
 import requests
 import numpy as np
 import pandas as pd
@@ -56,12 +57,20 @@ community_district_df['borough'] = community_district_df['commntydst'].apply(
               'Unknown'  # If unknown
 )
 
-# Convert GeoJSON "the_geom" string column to shapely:
+# Convert "the_geom" to shapely:
 community_district_df['the_geom'] = community_district_df['the_geom'].apply(lambda x: shape(x))
 
-# Convert community_district_df to a GeoDataFrame:
-community_district_df = gpd.GeoDataFrame(community_district_df, geometry='the_geom')
-
 #----------------------------------------------------------#
+# SAVE DATA TO DATA FOLDER:
 
+if community_district_df is not None:
+    community_district_df.to_csv(os.path.join('data\\', 'community_district_data.csv'), index=False)
+    print("community_district_df saved successfully.")
+else:
+    print("Failed to save community_district_df.")
 
+if project_df is not None:
+    project_df.to_csv(os.path.join('data\\', 'project_level_data.csv'), index=False)
+    print("Project-Level Data saved successfully.")
+else:
+    print("Failed to save community_district_df.")
